@@ -1,34 +1,43 @@
 import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { MOCK_ISSUES } from '../data/issues';
+import { useIssues } from '../context/IssueContext';
 import IssueCard from '../components/IssueCard';
 import Map from '../components/Map';
 
 const Dashboard = () => {
+    const { issues, loading, error } = useIssues();
     const [searchTerm, setSearchTerm] = useState('');
     const [searchParams] = useSearchParams();
     const categoryFilter = searchParams.get('category');
 
     const filteredIssues = useMemo(() => {
-        let issues = MOCK_ISSUES;
+        let filtered = issues;
 
         // Filter by category
         if (categoryFilter) {
-            issues = issues.filter(issue => issue.category === categoryFilter);
+            filtered = filtered.filter(issue => issue.category === categoryFilter);
         }
 
         // Filter by search term
         if (searchTerm) {
-            issues = issues.filter(issue =>
+            filtered = filtered.filter(issue =>
                 issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 issue.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                issue.location.address.toLowerCase().includes(searchTerm.toLowerCase())
+                (issue.location.address && issue.location.address.toLowerCase().includes(searchTerm.toLowerCase()))
             );
         }
-        return issues;
-    }, [searchTerm, categoryFilter]);
+        return filtered;
+    }, [issues, searchTerm, categoryFilter]);
 
     const pageTitle = categoryFilter ? `${categoryFilter} Issues` : 'All Civic Issues';
+
+    if (loading) {
+        return <div className="flex-1 p-8 lg:p-10 flex justify-center items-center"><p className="text-2xl text-gray-500">Loading issues...</p></div>;
+    }
+
+    if (error) {
+        return <div className="flex-1 p-8 lg:p-10 flex justify-center items-center"><p className="text-2xl text-red-500">Error loading issues. Please try again later.</p></div>;
+    }
 
     return (
         <main className="flex-1 p-8 lg:p-10 flex flex-col">

@@ -1,13 +1,14 @@
 import React from 'react';
 import { NavLink, useSearchParams } from 'react-router-dom';
-import { HomeIcon, MapIcon, ChartBarIcon, Cog8ToothIcon, UsersIcon, TagIcon } from '@heroicons/react/24/solid';
-import { MOCK_ISSUES } from '../data/issues';
+import { HomeIcon, MapIcon, ChartBarIcon, Cog8ToothIcon, UsersIcon, TagIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
+import { useIssues } from '../context/IssueContext';
 
 const Sidebar = () => {
+    const { issues } = useIssues();
     const [searchParams] = useSearchParams();
     const activeCategory = searchParams.get('category');
 
-    const categories = ['All', ...new Set(MOCK_ISSUES.map(issue => issue.category))];
+    const categories = ['All', ...new Set(issues.map(issue => issue.category))];
 
     const navLinkClasses = (isActive) =>
         `flex items-center w-full px-4 py-3 rounded-lg text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
@@ -27,6 +28,11 @@ const Sidebar = () => {
                 <NavLink to="/" className={({isActive}) => navLinkClasses(isActive && !activeCategory)} end>
                     <HomeIcon className="w-5 h-5 mr-3" />
                     <span className="text-lg">Dashboard</span>
+                </NavLink>
+
+                <NavLink to="/submit-issue" className={({isActive}) => navLinkClasses(isActive)}>
+                    <PencilSquareIcon className="w-5 h-5 mr-3" />
+                    <span className="text-lg">Submit Issue</span>
                 </NavLink>
 
                 {/* Category Filters */}

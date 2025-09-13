@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Reports from './pages/Reports';
 import Analytics from './pages/Analytics';
 import IssueDetail from './pages/IssueDetail';
+import SubmitIssue from './pages/SubmitIssue';
 
 const App = () => {
     return (
@@ -16,6 +17,7 @@ const App = () => {
                     <Route path="/issue/:id" element={<IssueDetail />} />
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/submit-issue" element={<SubmitIssue />} />
                     {/* Add routes for Users and Settings as placeholder pages */}
                     <Route path="/users" element={<div className="p-8"><h1 className="text-4xl font-extrabold text-gray-800">Users</h1></div>} />
                     <Route path="/settings" element={<div className="p-8"><h1 className="text-4xl font-extrabold text-gray-800">Settings</h1></div>} />
