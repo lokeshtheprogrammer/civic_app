@@ -1,0 +1,42 @@
+export const MOCK_USERS = [
+    {
+        id: 'u1',
+        name: 'Admin User',
+        email: 'admin@civic.gov',
+        role: 'Administrator',
+        department: 'System',
+        joinedAt: '2025-01-15T10:00:00Z',
+    },
+    {
+        id: 'u2',
+        name: 'Alice Johnson',
+        email: 'alice.j@publicworks.gov',
+        role: 'Staff',
+        department: 'Public Works',
+        joinedAt: '2025-02-20T11:30:00Z',
+    },
+    {
+        id: 'u3',
+        name: 'Bob Williams',
+        email: 'bob.w@sanitation.gov',
+        role: 'Staff',
+        department: 'Sanitation',
+        joinedAt: '2025-03-10T09:00:00Z',
+    },
+    {
+        id: 'c1',
+        name: 'Citizen A',
+        email: 'citizena@email.com',
+        role: 'Citizen',
+        department: 'N/A',
+        joinedAt: '2025-04-01T14:20:00Z',
+    },
+    {
+        id: 'c2',
+        name: 'Citizen B',
+        email: 'citizenb@email.com',
+        role: 'Citizen',
+        department: 'N/A',
+        joinedAt: '2025-05-22T18:05:00Z',
+    },
+];
