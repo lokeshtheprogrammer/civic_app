@@ -1,11 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api/client';
 
 const IssueContext = createContext();
-
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8000',
-});
 
 export const useIssues = () => {
     return useContext(IssueContext);
