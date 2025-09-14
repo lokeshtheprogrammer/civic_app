@@ -1,11 +1,13 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import List
 from jose import JWTError, jwt
+import cloudinary
+import cloudinary.uploader
 
-from . import crud, models, schemas, security
+from . import crud, models, schemas, security, config
 from .database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
@@ -130,3 +132,12 @@ def update_issue_status(
         raise HTTPException(status_code=404, detail="Issue not found")
     # A more robust implementation would check for valid status transitions
     return crud.update_issue_status(db=db, issue=issue, status=status_update.status)
+
+@app.post("/issues/upload-image/")
+async def upload_image(file: UploadFile = File(...), current_user: models.User = Depends(get_current_user)):
+    try:
+        # Upload image to Cloudinary
+        result = cloudinary.uploader.upload(file.file)
+        return {"url": result.get("secure_url")}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Image upload failed: {e}")

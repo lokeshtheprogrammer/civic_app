@@ -43,6 +43,7 @@ class IssueBase(BaseModel):
     category: str
     location: Location
     priority: str
+    imageUrl: Optional[str] = None
 
 class IssueCreate(IssueBase):
     pass

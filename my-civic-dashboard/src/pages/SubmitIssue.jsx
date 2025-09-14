@@ -10,12 +10,27 @@ const SubmitIssue = () => {
     const [category, setCategory] = useState('Roads');
     const [lat, setLat] = useState('');
     const [lng, setLng] = useState('');
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const categories = ["Roads", "Electricity", "Sanitation", "Water", "Public Works"];
 
-    const handleSubmit = (e) => {
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const newIssue = {
+        setLoading(true);
+        setError('');
+
+        const newIssueData = {
             title,
             description,
             category,
@@ -24,10 +39,18 @@ const SubmitIssue = () => {
                 lng: parseFloat(lng),
                 address: 'User Submitted Location' // Placeholder address
             },
-            priority: 'Medium' // Default priority
+            priority: 'Medium',
+            imageFile,
         };
-        addIssue(newIssue);
-        navigate('/');
+
+        try {
+            await addIssue(newIssueData);
+            navigate('/');
+        } catch (err) {
+            setError('Failed to submit issue. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -39,6 +62,7 @@ const SubmitIssue = () => {
 
             <section className="bg-white rounded-xl shadow-lg p-6 lg:p-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {error && <p className="text-red-500 text-sm text-center py-2">{error}</p>}
                     <div>
                         <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
                             Issue Title
@@ -68,6 +92,26 @@ const SubmitIssue = () => {
                             required
                         ></textarea>
                     </div>
+
+                    <div>
+                        <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
+                            Upload Image
+                        </label>
+                        <input
+                            type="file"
+                            id="image"
+                            onChange={handleImageChange}
+                            accept="image/*"
+                            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        />
+                    </div>
+
+                    {imagePreview && (
+                        <div className="mt-4">
+                            <img src={imagePreview} alt="Image preview" className="w-full max-w-xs rounded-lg shadow-md" />
+                        </div>
+                    )}
+
 
                     <div>
                         <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
@@ -119,9 +163,10 @@ const SubmitIssue = () => {
                     <div className="flex justify-end pt-4">
                         <button
                             type="submit"
-                            className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300"
+                            disabled={loading}
+                            className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300 disabled:bg-gray-400"
                         >
-                            Submit Issue
+                            {loading ? 'Submitting...' : 'Submit Issue'}
                         </button>
                     </div>
                 </form>

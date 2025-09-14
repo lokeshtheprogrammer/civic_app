@@ -37,7 +37,8 @@ def create_issue(db: Session, issue: schemas.IssueCreate, user_id: str):
         latitude=issue.location.lat,
         longitude=issue.location.lng,
         address=issue.location.address,
-        reporter_id=user_id
+        reporter_id=user_id,
+        imageUrl=issue.imageUrl
     )
     db.add(db_issue)
     db.commit()

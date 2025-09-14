@@ -29,12 +29,33 @@ export const IssueProvider = ({ children }) => {
 
     const addIssue = async (issueData) => {
         try {
-            const response = await apiClient.post('/issues', issueData);
+            let imageUrl = null;
+            if (issueData.imageFile) {
+                const formData = new FormData();
+                formData.append('file', issueData.imageFile);
+                const imageResponse = await apiClient.post('/issues/upload-image/', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                imageUrl = imageResponse.data.url;
+            }
+
+            const finalIssueData = {
+                title: issueData.title,
+                description: issueData.description,
+                category: issueData.category,
+                location: issueData.location,
+                priority: issueData.priority,
+                imageUrl: imageUrl,
+            };
+
+            const response = await apiClient.post('/issues/', finalIssueData);
             setIssues(prevIssues => [response.data, ...prevIssues]);
         } catch (err) {
             setError(err);
             console.error("Failed to add issue:", err);
-            // Optionally re-throw or handle the error in the UI
+            throw err; // Re-throw to be caught in the component
         }
     };
 
