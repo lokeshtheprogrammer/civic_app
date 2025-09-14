@@ -54,9 +54,14 @@ class Issue(IssueBase):
     reportedAt: datetime
     imageUrl: Optional[str] = None
     reporter: User
+    assignee_id: Optional[str] = None
+    assignee: Optional[User] = None
 
     class Config:
         orm_mode = True
+
+class IssueUpdate(BaseModel):
+    status: Optional[str] = None
 
 # Token Schemas
 class Token(BaseModel):

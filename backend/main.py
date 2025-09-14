@@ -55,6 +55,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         raise credentials_exception
     return user
 
+def get_current_active_officer(current_user: models.User = Depends(get_current_user)):
+    if current_user.role != "officer":
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    return current_user
+
 @app.post("/token", response_model=schemas.Token)
 async def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
     user = crud.get_user_by_email(db, email=form_data.username)
@@ -89,6 +94,39 @@ def read_issues(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     issues = crud.get_issues(db, skip=skip, limit=limit)
     return issues
 
+@app.get("/issues/{issue_id}", response_model=schemas.Issue)
+def read_issue(issue_id: str, db: Session = Depends(get_db)):
+    db_issue = crud.get_issue(db, issue_id=issue_id)
+    if db_issue is None:
+        raise HTTPException(status_code=404, detail="Issue not found")
+    return db_issue
+
 @app.post("/issues/", response_model=schemas.Issue)
 def create_issue(issue: schemas.IssueCreate, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     return crud.create_issue(db=db, issue=issue, user_id=current_user.id)
+
+@app.patch("/issues/{issue_id}/assign", response_model=schemas.Issue)
+def assign_issue_to_self(
+    issue_id: str,
+    db: Session = Depends(get_db),
+    current_officer: models.User = Depends(get_current_active_officer),
+):
+    issue = crud.get_issue(db, issue_id=issue_id)
+    if not issue:
+        raise HTTPException(status_code=404, detail="Issue not found")
+    if issue.assignee_id:
+        raise HTTPException(status_code=400, detail="Issue already assigned")
+    return crud.assign_issue_to_user(db=db, issue=issue, user_id=current_officer.id)
+
+@app.patch("/issues/{issue_id}/status", response_model=schemas.Issue)
+def update_issue_status(
+    issue_id: str,
+    status_update: schemas.IssueUpdate,
+    db: Session = Depends(get_db),
+    current_officer: models.User = Depends(get_current_active_officer),
+):
+    issue = crud.get_issue(db, issue_id=issue_id)
+    if not issue:
+        raise HTTPException(status_code=404, detail="Issue not found")
+    # A more robust implementation would check for valid status transitions
+    return crud.update_issue_status(db=db, issue=issue, status=status_update.status)

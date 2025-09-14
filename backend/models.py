@@ -23,7 +23,8 @@ class User(Base):
     department_id = Column(String, ForeignKey("departments.id"), nullable=True)
 
     department = relationship("Department", back_populates="officers")
-    issues_reported = relationship("Issue", back_populates="reporter")
+    issues_reported = relationship("Issue", back_populates="reporter", foreign_keys="[Issue.reporter_id]")
+    issues_assigned = relationship("Issue", back_populates="assignee", foreign_keys="[Issue.assignee_id]")
 
 class Issue(Base):
     __tablename__ = "issues"
@@ -41,4 +42,7 @@ class Issue(Base):
     imageUrl = Column(String, nullable=True)
 
     reporter_id = Column(String, ForeignKey("users.id"))
-    reporter = relationship("User", back_populates="issues_reported")
+    reporter = relationship("User", back_populates="issues_reported", foreign_keys=[reporter_id])
+
+    assignee_id = Column(String, ForeignKey("users.id"), nullable=True)
+    assignee = relationship("User", back_populates="issues_assigned", foreign_keys=[assignee_id])

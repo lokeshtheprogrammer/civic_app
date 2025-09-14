@@ -24,6 +24,9 @@ def create_user(db: Session, user: schemas.UserCreate):
 def get_issues(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Issue).offset(skip).limit(limit).all()
 
+def get_issue(db: Session, issue_id: str):
+    return db.query(models.Issue).filter(models.Issue.id == issue_id).first()
+
 def create_issue(db: Session, issue: schemas.IssueCreate, user_id: str):
     db_issue = models.Issue(
         id=str(uuid.uuid4()),
@@ -40,3 +43,15 @@ def create_issue(db: Session, issue: schemas.IssueCreate, user_id: str):
     db.commit()
     db.refresh(db_issue)
     return db_issue
+
+def assign_issue_to_user(db: Session, issue: models.Issue, user_id: str):
+    issue.assignee_id = user_id
+    db.commit()
+    db.refresh(issue)
+    return issue
+
+def update_issue_status(db: Session, issue: models.Issue, status: str):
+    issue.status = status
+    db.commit()
+    db.refresh(issue)
+    return issue
