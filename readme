@@ -1,0 +1,52 @@
+### **Civic Issue Reporting System - Backend**
+
+This directory contains the backend for the Crowdsourced Civic Issue Reporting and Resolution System, built with FastAPI.
+
+#### **Features**
+
+  * **User Authentication:** Secure user registration and login using JWT tokens.
+  * **Role-Based Access Control:** Differentiates between "citizen" and "officer" roles.
+  * **Issue Management:** Full CRUD functionality for civic issues.
+  * **Image Uploads:** Integrates with Cloudinary for image storage.
+  * **Voting System:** Allows users to upvote issues.
+  * **Notifications:** Sends push notifications via Firebase Cloud Messaging (FCM).
+  * **Analytics:** Provides aggregated data on issue statuses and categories.
+  * **Action Logging:** Records all major actions for auditing.
+
+#### **Project Setup**
+
+##### **1. Prerequisites**
+
+  * Python 3.8+
+  * PostgreSQL Database
+
+##### **2. Installation**
+
+Navigate to the project root and install the required Python packages:
+
+```bash
+pip install -r backend/requirements.txt
+```
+
+##### **3. Environment Configuration**
+
+In the `backend/` directory, create a file named `.env`.
+Copy the content from `.env.example` into your new `.env` file.
+Fill in the values for the following variables:
+
+  * `DATABASE_URL`
+  * `SECRET_KEY` (Generate one with `openssl rand -hex 32`)
+  * `CLOUDINARY_CLOUD_NAME`
+  * `CLOUDINARY_API_KEY`
+  * `CLOUDINARY_API_SECRET`
+  * `FIREBASE_SERVICE_ACCOUNT_KEY_JSON` (Paste the full JSON content as a single line)
+
+##### **4. Running the Application**
+
+From the project root directory, run the development server:
+
+```bash
+uvicorn backend.main:app --reload
+```
+
+The API will be available at `http://127.0.0.1:8000`. You can access the interactive API documentation (Swagger UI) at `http://127.0.0.1:8000/docs`.
