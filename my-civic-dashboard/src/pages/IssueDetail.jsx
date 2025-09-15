@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { ArrowLeftIcon } from '@heroicons/react/24/solid';
+import { ArrowLeftIcon, HandThumbUpIcon } from '@heroicons/react/24/solid';
 
 const IssueDetail = () => {
     const { id } = useParams();
@@ -44,6 +44,15 @@ const IssueDetail = () => {
             setIssue(response.data);
         } catch (err) {
             alert('Failed to update status.');
+        }
+    };
+
+    const handleVote = async () => {
+        try {
+            const response = await apiClient.post(`/issues/${issue.id}/vote`);
+            setIssue(response.data);
+        } catch (err) {
+            alert('Failed to cast vote.');
         }
     };
 
@@ -105,6 +114,20 @@ const IssueDetail = () => {
                                 {issue.status}
                             </span>
                         </div>
+
+                        <div className="flex items-center gap-4 mb-6">
+                            <button
+                                onClick={handleVote}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200 ${
+                                    issue.has_voted ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                }`}
+                            >
+                                <HandThumbUpIcon className="w-5 h-5" />
+                                <span>{issue.has_voted ? 'Voted' : 'Upvote'}</span>
+                            </button>
+                            <span className="font-bold text-gray-800">{issue.vote_count} Votes</span>
+                        </div>
+
 
                         <p className="text-gray-600 mb-6">{issue.description}</p>
 

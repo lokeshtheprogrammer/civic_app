@@ -57,6 +57,8 @@ class Issue(IssueBase):
     reporter: User
     assignee_id: Optional[str] = None
     assignee: Optional[User] = None
+    vote_count: int
+    has_voted: Optional[bool] = False
 
     class Config:
         orm_mode = True

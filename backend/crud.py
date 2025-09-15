@@ -97,3 +97,16 @@ def get_issue_count_by_status(db: Session):
 
 def get_issue_count_by_category(db: Session):
     return db.query(models.Issue.category, func.count(models.Issue.id)).group_by(models.Issue.category).all()
+
+# Vote Functions
+def add_vote(db: Session, issue: models.Issue, user: models.User):
+    issue.voted_by_users.append(user)
+    db.commit()
+    db.refresh(issue)
+    return issue
+
+def remove_vote(db: Session, issue: models.Issue, user: models.User):
+    issue.voted_by_users.remove(user)
+    db.commit()
+    db.refresh(issue)
+    return issue

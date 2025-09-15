@@ -105,11 +105,33 @@ def read_issues(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return issues
 
 @app.get("/issues/{issue_id}", response_model=schemas.Issue)
-def read_issue(issue_id: str, db: Session = Depends(get_db)):
+def read_issue(issue_id: str, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     db_issue = crud.get_issue(db, issue_id=issue_id)
     if db_issue is None:
         raise HTTPException(status_code=404, detail="Issue not found")
+    db_issue.has_voted = current_user in db_issue.voted_by_users
     return db_issue
+
+@app.post("/issues/{issue_id}/vote", response_model=schemas.Issue)
+def vote_for_issue(
+    issue_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    issue = crud.get_issue(db, issue_id=issue_id)
+    if not issue:
+        raise HTTPException(status_code=404, detail="Issue not found")
+
+    if current_user in issue.voted_by_users:
+        # User has already voted, so this is an "unvote"
+        updated_issue = crud.remove_vote(db, issue=issue, user=current_user)
+        updated_issue.has_voted = False
+    else:
+        # User has not voted, so this is a "vote"
+        updated_issue = crud.add_vote(db, issue=issue, user=current_user)
+        updated_issue.has_voted = True
+
+    return updated_issue
 
 @app.post("/issues/", response_model=schemas.Issue)
 def create_issue(issue: schemas.IssueCreate, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):

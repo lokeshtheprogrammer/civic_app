@@ -37,6 +37,19 @@ const OfficerDashboard = () => {
         fetchIssues();
     }, [activeTab]);
 
+    const handleVote = async (issueId) => {
+        try {
+            const response = await apiClient.post(`/issues/${issueId}/vote`);
+            setIssues(prevIssues =>
+                prevIssues.map(issue =>
+                    issue.id === issueId ? response.data : issue
+                )
+            );
+        } catch (err) {
+            alert('Failed to cast vote.');
+        }
+    };
+
     const renderContent = () => {
         if (loading) {
             return <div className="flex-1 p-8 lg:p-10 flex justify-center items-center"><p className="text-2xl text-gray-500">Loading issues...</p></div>;
@@ -50,7 +63,7 @@ const OfficerDashboard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                 {issues.length > 0 ? (
                     issues.map(issue => (
-                        <IssueCard key={issue.id} issue={issue} />
+                        <IssueCard key={issue.id} issue={issue} onVote={handleVote} />
                     ))
                 ) : (
                     <p className="text-gray-500 col-span-full text-center py-10">No issues found for this view.</p>

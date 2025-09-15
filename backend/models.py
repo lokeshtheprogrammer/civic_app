@@ -1,8 +1,13 @@
-from sqlalchemy import Column, String, Float, DateTime, ForeignKey
+from sqlalchemy import Column, String, Float, DateTime, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from .database import Base
 import uuid
 from datetime import datetime
+
+vote_association_table = Table('vote_association', Base.metadata,
+    Column('user_id', String, ForeignKey('users.id'), primary_key=True),
+    Column('issue_id', String, ForeignKey('issues.id'), primary_key=True)
+)
 
 class Department(Base):
     __tablename__ = "departments"
@@ -27,6 +32,8 @@ class User(Base):
     issues_reported = relationship("Issue", back_populates="reporter", foreign_keys="[Issue.reporter_id]")
     issues_assigned = relationship("Issue", back_populates="assignee", foreign_keys="[Issue.assignee_id]")
 
+    votes = relationship("Issue", secondary=vote_association_table, back_populates="voted_by_users")
+
 class Issue(Base):
     __tablename__ = "issues"
 
@@ -47,3 +54,9 @@ class Issue(Base):
 
     assignee_id = Column(String, ForeignKey("users.id"), nullable=True)
     assignee = relationship("User", back_populates="issues_assigned", foreign_keys=[assignee_id])
+
+    voted_by_users = relationship("User", secondary=vote_association_table, back_populates="votes")
+
+    @property
+    def vote_count(self):
+        return len(self.voted_by_users)
