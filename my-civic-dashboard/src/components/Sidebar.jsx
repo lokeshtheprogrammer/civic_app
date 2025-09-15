@@ -1,13 +1,16 @@
 import React from 'react';
 import { NavLink, useSearchParams } from 'react-router-dom';
-import { HomeIcon, MapIcon, ChartBarIcon, Cog8ToothIcon, UsersIcon, TagIcon } from '@heroicons/react/24/solid';
-import { MOCK_ISSUES } from '../data/issues';
+import { HomeIcon, MapIcon, ChartBarIcon, Cog8ToothIcon, UsersIcon, TagIcon, PencilSquareIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/solid';
+import { useIssues } from '../context/IssueContext';
+import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
+    const { issues } = useIssues();
+    const { user, logout } = useAuth();
     const [searchParams] = useSearchParams();
     const activeCategory = searchParams.get('category');
 
-    const categories = ['All', ...new Set(MOCK_ISSUES.map(issue => issue.category))];
+    const categories = ['All', ...new Set(issues.map(issue => issue.category))];
 
     const navLinkClasses = (isActive) =>
         `flex items-center w-full px-4 py-3 rounded-lg text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
@@ -15,6 +18,9 @@ const Sidebar = () => {
                 ? 'bg-blue-600 text-white shadow-md'
                 : 'text-gray-300 hover:bg-gray-700 hover:text-white'
         }`;
+
+    const buttonClasses = `flex items-center w-full px-4 py-3 rounded-lg text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-gray-300 hover:bg-gray-700 hover:text-white`;
+
 
     return (
         <aside className="w-64 bg-gray-800 text-white p-6 h-auto flex flex-col rounded-l-lg shadow-lg">
@@ -27,6 +33,11 @@ const Sidebar = () => {
                 <NavLink to="/" className={({isActive}) => navLinkClasses(isActive && !activeCategory)} end>
                     <HomeIcon className="w-5 h-5 mr-3" />
                     <span className="text-lg">Dashboard</span>
+                </NavLink>
+
+                <NavLink to="/submit-issue" className={({isActive}) => navLinkClasses(isActive)}>
+                    <PencilSquareIcon className="w-5 h-5 mr-3" />
+                    <span className="text-lg">Submit Issue</span>
                 </NavLink>
 
                 {/* Category Filters */}
@@ -53,14 +64,15 @@ const Sidebar = () => {
                 </NavLink>
             </nav>
             <div className="mt-8 pt-4 border-t border-gray-700">
-                <NavLink to="/users" className={({isActive}) => navLinkClasses(isActive)}>
-                    <UsersIcon className="w-5 h-5 mr-3" />
-                    <span className="text-lg">Users</span>
-                </NavLink>
-                <NavLink to="/settings" className={({isActive}) => `${navLinkClasses({isActive})} mt-2`}>
-                    <Cog8ToothIcon className="w-5 h-5 mr-3" />
-                    <span className="text-lg">Settings</span>
-                </NavLink>
+                {user && (
+                    <div className="text-center mb-4">
+                        <p className="text-sm font-medium text-gray-400">{user.email}</p>
+                    </div>
+                )}
+                <button onClick={logout} className={buttonClasses}>
+                    <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
+                    <span className="text-lg">Logout</span>
+                </button>
             </div>
         </aside>
     );
