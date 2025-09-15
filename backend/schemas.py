@@ -81,3 +81,17 @@ class DeviceToken(BaseModel):
 class AnalyticsDataPoint(BaseModel):
     name: str
     value: int
+
+# Log Schemas
+class LogBase(BaseModel):
+    action: str
+    details: Optional[dict] = None
+
+class Log(LogBase):
+    id: str
+    timestamp: datetime
+    user_id: str
+    user: User
+
+    class Config:
+        orm_mode = True

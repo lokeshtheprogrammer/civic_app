@@ -216,3 +216,13 @@ def get_analytics_category(
 ):
     data = crud.get_issue_count_by_category(db)
     return [{"name": name, "value": value} for name, value in data]
+
+@app.get("/logs/", response_model=List[schemas.Log])
+def read_logs(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_officer: models.User = Depends(get_current_active_officer),
+):
+    logs = crud.get_logs(db, skip=skip, limit=limit)
+    return logs

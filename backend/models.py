@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, Float, DateTime, ForeignKey, Table
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from .database import Base
 import uuid
@@ -60,3 +61,14 @@ class Issue(Base):
     @property
     def vote_count(self):
         return len(self.voted_by_users)
+
+class Log(Base):
+    __tablename__ = "logs"
+
+    id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    user_id = Column(String, ForeignKey("users.id"))
+    action = Column(String, index=True)
+    details = Column(JSONB)
+
+    user = relationship("User")
