@@ -71,3 +71,6 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: Optional[str] = None
+
+class DeviceToken(BaseModel):
+    device_token: str

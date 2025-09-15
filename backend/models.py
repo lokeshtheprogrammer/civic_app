@@ -21,6 +21,7 @@ class User(Base):
     full_name = Column(String)
     role = Column(String, index=True) # "citizen", "officer", "admin"
     department_id = Column(String, ForeignKey("departments.id"), nullable=True)
+    device_token = Column(String, nullable=True)
 
     department = relationship("Department", back_populates="officers")
     issues_reported = relationship("Issue", back_populates="reporter", foreign_keys="[Issue.reporter_id]")

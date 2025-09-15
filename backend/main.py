@@ -87,6 +87,14 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 async def read_users_me(current_user: schemas.User = Depends(get_current_user)):
     return current_user
 
+@app.post("/users/me/device-token", response_model=schemas.User)
+def update_device_token(
+    token_data: schemas.DeviceToken,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    return crud.update_user_device_token(db, user=current_user, token=token_data.device_token)
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Civic Issue Tracker API"}
@@ -132,6 +140,34 @@ def update_issue_status(
         raise HTTPException(status_code=404, detail="Issue not found")
     # A more robust implementation would check for valid status transitions
     return crud.update_issue_status(db=db, issue=issue, status=status_update.status)
+
+@app.get("/issues/me/", response_model=List[schemas.Issue])
+def read_my_issues(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+    skip: int = 0,
+    limit: int = 100,
+):
+    return crud.get_issues_by_reporter(db, user_id=current_user.id, skip=skip, limit=limit)
+
+@app.get("/issues/unassigned/", response_model=List[schemas.Issue])
+def read_unassigned_issues(
+    db: Session = Depends(get_db),
+    current_officer: models.User = Depends(get_current_active_officer),
+    skip: int = 0,
+    limit: int = 100,
+):
+    return crud.get_unassigned_issues(db, skip=skip, limit=limit)
+
+@app.get("/issues/assigned/", response_model=List[schemas.Issue])
+def read_assigned_issues(
+    db: Session = Depends(get_db),
+    current_officer: models.User = Depends(get_current_active_officer),
+    skip: int = 0,
+    limit: int = 100,
+):
+    return crud.get_issues_by_assignee(db, user_id=current_officer.id, skip=skip, limit=limit)
+
 
 @app.post("/issues/upload-image/")
 async def upload_image(file: UploadFile = File(...), current_user: models.User = Depends(get_current_user)):

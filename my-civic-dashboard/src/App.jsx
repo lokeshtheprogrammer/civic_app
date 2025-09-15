@@ -9,6 +9,7 @@ import SubmitIssue from './pages/SubmitIssue';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import NotificationHandler from './components/NotificationHandler';
 
 const App = () => {
     const location = useLocation();
@@ -20,6 +21,7 @@ const App = () => {
         <div className="min-h-screen bg-gray-100 font-sans text-gray-900 flex">
             {showSidebar && <Sidebar />}
             <div className="flex-1 flex flex-col">
+                <NotificationHandler />
                 <Routes>
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />

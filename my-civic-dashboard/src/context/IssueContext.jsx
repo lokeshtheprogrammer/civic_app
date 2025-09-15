@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 import apiClient from '../api/client';
 
 const IssueContext = createContext();
@@ -9,23 +9,8 @@ export const useIssues = () => {
 
 export const IssueProvider = ({ children }) => {
     const [issues, setIssues] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchIssues = async () => {
-            try {
-                const response = await apiClient.get('/issues');
-                setIssues(response.data);
-            } catch (err) {
-                setError(err);
-                console.error("Failed to fetch issues:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchIssues();
-    }, []);
+    // Note: Loading and error state management will be moved to the components
+    // that actually do the fetching, to be more granular.
 
     const addIssue = async (issueData) => {
         try {
@@ -51,19 +36,17 @@ export const IssueProvider = ({ children }) => {
             };
 
             const response = await apiClient.post('/issues/', finalIssueData);
-            setIssues(prevIssues => [response.data, ...prevIssues]);
+            // We can't just add to the list anymore, as the list is now role-specific.
+            // The component will need to refetch its data after a successful submission.
+            return response.data;
         } catch (err) {
-            setError(err);
             console.error("Failed to add issue:", err);
             throw err; // Re-throw to be caught in the component
         }
     };
 
     const value = {
-        issues,
         addIssue,
-        loading,
-        error,
     };
 
     return (
