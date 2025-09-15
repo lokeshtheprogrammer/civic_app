@@ -177,3 +177,20 @@ async def upload_image(file: UploadFile = File(...), current_user: models.User =
         return {"url": result.get("secure_url")}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image upload failed: {e}")
+
+# Analytics Endpoints
+@app.get("/analytics/issues-by-status", response_model=List[schemas.AnalyticsDataPoint])
+def get_analytics_status(
+    db: Session = Depends(get_db),
+    current_officer: models.User = Depends(get_current_active_officer),
+):
+    data = crud.get_issue_count_by_status(db)
+    return [{"name": name, "value": value} for name, value in data]
+
+@app.get("/analytics/issues-by-category", response_model=List[schemas.AnalyticsDataPoint])
+def get_analytics_category(
+    db: Session = Depends(get_db),
+    current_officer: models.User = Depends(get_current_active_officer),
+):
+    data = crud.get_issue_count_by_category(db)
+    return [{"name": name, "value": value} for name, value in data]

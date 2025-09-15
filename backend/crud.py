@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from . import models, schemas
 from .security import get_password_hash
 import uuid
@@ -89,3 +90,10 @@ def update_issue_status(db: Session, issue: models.Issue, status: str):
             print(f"Error sending FCM message: {e}")
 
     return issue
+
+# Analytics Functions
+def get_issue_count_by_status(db: Session):
+    return db.query(models.Issue.status, func.count(models.Issue.id)).group_by(models.Issue.status).all()
+
+def get_issue_count_by_category(db: Session):
+    return db.query(models.Issue.category, func.count(models.Issue.id)).group_by(models.Issue.category).all()

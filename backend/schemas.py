@@ -74,3 +74,8 @@ class TokenData(BaseModel):
 
 class DeviceToken(BaseModel):
     device_token: str
+
+# Analytics Schemas
+class AnalyticsDataPoint(BaseModel):
+    name: str
+    value: int
